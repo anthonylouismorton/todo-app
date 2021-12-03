@@ -1,85 +1,165 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import useForm from '../../hooks/form.js';
+import { SettingsContext } from '../../context/settings.js';
+import { DataGrid } from '@mui/x-data-grid';
+import {Box, TextField, Button} from '@mui/material';
 import { v4 as uuid } from 'uuid';
-import List from '../list/list.js'
 
 const ToDo = () => {
+    let SettingsValues = useContext(SettingsContext); // This is how you bring in context and how you opt into using context in your component.
+    console.log(SettingsValues.completed)
+    const [list, setList] = useState([]);
+    const [incomplete, setIncomplete] = useState([]);
+    const [endIndex, setEndIndex] = useState(SettingsValues.pagination);
 
-  const [list, setList] = useState([]);
-  const [incomplete, setIncomplete] = useState([]);
-  const { handleChange, handleSubmit } = useForm(addItem);
+    const { handleChange, handleSubmit } = useForm(addItem);
 
-  function addItem(item) {
-    item.id = uuid();
-    item.complete = false;
-    setList([...list, item]);
-  }
+    function addItem(item) {
 
-  function deleteItem(id) {
-    const items = list.filter( item => item.id !== id );
-    setList(items);
-  }
+        item.id = uuid();
+        item.complete = false;
+        if(!list.includes(item)){
+          
+          setList([...list, item]);
+        }
+        else{
+          alert('cant add the same item')
+        }
+    }
+    
 
-  function toggleComplete(id) {
+    function deleteItem(id) {
+        const items = list.filter((item) => item.id !== id);
+        setList(items);
+    }
 
-    const items = list.map( item => {
-      if ( item.id == id ) {
-        item.complete = ! item.complete;
-      }
-      return item;
-    });
+    function toggleComplete(id) {
+        const items = list.map((item) => {
+            if (item.id == id) {
+                item.complete = !item.complete;
+            }
+            return item;
+        });
 
-    setList(items);
+        setList(items);
+    }
+    const completeButton = (id) => {
+      return (
+        <Button>
+          color ="primary"
+          onClick={toggleComplete(id)}
+        </Button>
+      )
+    }
 
-  }
+    // useEffect(() => {
+    //   if(!props.completed){
+    //     let incompleteCount = list.filter((item) => !item.complete).length;
+    //     setIncomplete(incompleteCount);
+    //   }
+    //   else{
 
-  useEffect(() => {
-    let incompleteCount = list.filter(item => !item.complete).length;
-    setIncomplete(incompleteCount);
-    document.title = `To Do List: ${incomplete}`;
-  }, [list]);
+    //   }
+    //     document.title = `To Do List: ${incomplete}`;
+    // }, [list]);
 
-  return (
-    <>
-      <header>
-        <h1>To Do List: {incomplete} items pending</h1>
-      </header>
-      <List/>
-      <form onSubmit={handleSubmit}>
+    const paginate = () => {
+        let startIndex = endIndex - SettingsValues.pagination;
 
-        <h2>Add To Do Item</h2>
+        return list.slice(startIndex, endIndex);
+    };
 
-        <label>
-          <span>To Do Item</span>
-          <input onChange={handleChange} name="text" type="text" placeholder="Item Details" />
-        </label>
+    const handleNext = (e) => {
+        e.preventDefault();
+        setEndIndex(endIndex + SettingsValues.pagination);
+    };
+    const handlePrev = (e) => {
+        e.preventDefault();
+        setEndIndex(endIndex - SettingsValues.pagination);
+    };
 
-        <label>
-          <span>Assigned To</span>
-          <input onChange={handleChange} name="assignee" type="text" placeholder="Assignee Name" />
-        </label>
+    const columns = [
+        { field: 'id', headerName: 'id', width: 200 },
+        { field: 'complete', headerName: 'Complete', width: 200 },
+        { field: 'text', headerName: 'To-Do', width: 400 },
+        { field: 'assignee', headerName: 'Assigned To', width: 130 },
+        {
+            field: 'difficulty',
+            headerName: 'Difficulty',
+            type: 'number',
+            width: 90,
+        },
+        { field: 'completed', 
+        headerName: 'completed', 
+        width: 150,
+        // renderCell: completeButton()
+        }
+    ];
 
-        <label>
-          <span>Difficulty</span>
-          <input onChange={handleChange} defaultValue={3} type="range" min={1} max={5} name="difficulty" />
-        </label>
+    const rows = [
+        { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
+        { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
+        { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
+        { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
+        { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
+        { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
+        { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
+        { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
+        { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
+    ];
 
-        <label>
-          <button type="submit">Add Item</button>
-        </label>
-      </form>
-
-      {list.map(item => (
-        <div key={item.id}>
-          <p>{item.text}</p>
-          <p><small>Assigned to: {item.assignee}</small></p>
-          <p><small>Difficulty: {item.difficulty}</small></p>
-          <div onClick={() => toggleComplete(item.id)}>Complete: {item.complete.toString()}</div>
-          <hr />
-        </div>
-      ))}
-
-    </>
+    return (
+      <>
+          <Box
+              component='form'
+              sx={{
+                  '& .MuiTextField-root': { m: 1, width: '25ch' },
+              }}
+              noValidate
+              autoComplete='off'
+              onSubmit={handleSubmit}
+          >
+              <div>
+                  <TextField
+                      name='assignee'
+                      label='Assign-To'
+                      multiline
+                      maxRows={4}
+                      // value={list}
+                      onChange={handleChange}
+                      variant='standard'
+                  />
+                  <TextField
+                      name='difficulty'
+                      label='Difficulty(1-5)'
+                      placeholder='Placeholder'
+                      multiline
+                      variant='standard'
+                      onChange={handleChange}
+                  />
+                  <TextField
+                      name='text'
+                      label='To-Do'
+                      multiline
+                      maxRows={4}
+                      // value={list}
+                      onChange={handleChange}
+                      variant='standard'
+                  />
+                  <button type='submit'>Add Item</button>
+              </div>
+          </Box>
+          <div style={{ height: 400, width: '100%' }}>
+            {SettingsValues.completed? list : list.filter((item) => { !item.complete})}
+              <DataGrid
+                  rows={list}
+                  columns={columns}
+                  pageSize={SettingsValues.pagination}
+                  rowsPerPageOptions={[5]}
+                  checkboxSelection
+                  />
+          </div>
+      </>
   );
 };
 

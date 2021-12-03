@@ -1,13 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './app.js';
-//import './index.scss'
+import SettingsProvider from './context/settings';
 
-function Main() {
-    return(
-      <App />
-      ) 
-      
+
+class Main extends React.Component {
+  render() {
+    return (
+      <SettingsProvider>
+          <App />
+      </SettingsProvider>
+    );
+  }
 }
 
 const rootElement = document.getElementById('root');
