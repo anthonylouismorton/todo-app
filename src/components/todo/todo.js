@@ -4,6 +4,7 @@ import { SettingsContext } from '../../context/settings.js';
 import { DataGrid } from '@mui/x-data-grid';
 import {Box, TextField, Button} from '@mui/material';
 import { v4 as uuid } from 'uuid';
+import axios from 'axios'
 
 const ToDo = () => {
     let SettingsValues = useContext(SettingsContext); // This is how you bring in context and how you opt into using context in your component.
@@ -14,8 +15,10 @@ const ToDo = () => {
 
     const { handleChange, handleSubmit } = useForm(addItem);
 
-    function addItem(item) {
-
+    async function addItem(item){
+        // let itemURL = `${process.env.REACT_APP_SERVER}test`
+        // const itemResponse = await axios.post(itemURL)
+        // console.log(itemResponse)
         item.id = uuid();
         item.complete = false;
         if(!list.includes(item)){

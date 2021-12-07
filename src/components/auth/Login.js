@@ -22,7 +22,6 @@ function Login() {
     login(user, pass);
   }
 
-  console.log(isLoggedIn)
   return (
     <>
       {isLoggedIn
