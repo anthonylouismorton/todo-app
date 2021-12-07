@@ -16,9 +16,10 @@ const ToDo = () => {
     const { handleChange, handleSubmit } = useForm(addItem);
 
     async function addItem(item){
-        // let itemURL = `${process.env.REACT_APP_SERVER}test`
-        // const itemResponse = await axios.post(itemURL)
-        // console.log(itemResponse)
+        console.log(item)
+        let itemURL = `${process.env.REACT_APP_SERVER}toDO=1`
+        const itemResponse = await axios.post(itemURL)
+        console.log(itemResponse)
         item.id = uuid();
         item.complete = false;
         if(!list.includes(item)){
