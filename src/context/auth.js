@@ -31,16 +31,18 @@ function AuthProvider({ children }) {
 
     // send a http request with username and password in the request headers
     let user = testUsers[username];
-
+    
     // validating appropriate user stuff is returned from the server.
     if (user) {
+      
+      setIsLoggedIn(true);
       const token = jwt.sign({ user }, SECRET);
       setUser({
         username: user.username,
         token: token,
         capabilities: user.capabilities
       });
-      setIsLoggedIn(true);
+      console.log(isLoggedIn)
     }
   }
 

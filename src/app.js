@@ -15,21 +15,21 @@ function App() {
       <>
           <Router>
               <Login/>
-              <Auth>
+                  <Auth>
             <Header />
               <Switch>
                   {/* { Main Route /} */}
                   <Route exact path='/'>
-                      <Auth>
                       <ToDo/>
-                      </Auth>
                   </Route>
                   {/* {/ Route to Settings} */}
                   <Route path='/settings'>
+            
                       <Settings/>
                   </Route>
               </Switch>
-              </Auth>
+                  </Auth>
+              
             <Footer />
           </Router>
       </>
